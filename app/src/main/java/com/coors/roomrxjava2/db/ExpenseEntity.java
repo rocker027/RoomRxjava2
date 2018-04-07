@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = ExpenseEntity.TABLE_EXPENSE)
-class ExpenseEntity {
+public class ExpenseEntity {
     public static final String TABLE_EXPENSE = "expense";
     public static final String COL_E_UID = "expense_uid";
     public static final String COL_E_CDATE = "expense_date";
