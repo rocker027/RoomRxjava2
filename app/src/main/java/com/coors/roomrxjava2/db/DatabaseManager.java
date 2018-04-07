@@ -5,6 +5,12 @@ import android.content.Context;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class DatabaseManager {
     private Context context;
     private AppDatabase db;
@@ -46,7 +52,21 @@ public class DatabaseManager {
     }
 
     // query expense
-    public List<ExpenseEntity> getAllExpense() {
-        return db.expenseDao().getAllExpense();
+    public void getAllExpense(final DatabaseCallback callback) {
+        db.expenseDao().getAllExpense()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<List<ExpenseEntity>>() {
+                            @Override
+                            public void accept(List<ExpenseEntity> expenseEntities) throws Exception {
+                                callback.onDataLoaded(expenseEntities);
+                            }
+        });
+    }
+
+    // query expense by uid
+    public Maybe<ExpenseEntity> getExpenseByUid(long uid) {
+        return db.expenseDao().getExpenseByUid(uid);
     }
 }
