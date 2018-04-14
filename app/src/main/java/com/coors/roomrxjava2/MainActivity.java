@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -23,18 +25,38 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
     private Button button;
     private EditText editText;
+    private String text = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Observable<String> test = getTextObs();
+        test.subscribe(new Consumer<String>() {
+            @Override
+            public void accept(String s) throws Exception {
+                Log.d(TAG, "accept: " + s);
+            }
+        });
+
+        Observable.interval(5, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        Log.d(TAG, "accept: " + "5秒到了");
+                        text = "100";
+                    }
+                });
         findViews();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+
+
 
         Observable<String> buttonOnClickObservable = createSearchButtonOnClickObservable();
         buttonOnClickObservable
@@ -128,4 +150,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private Observable<String> getTextObs() {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                if (text == null) {
+                    e.onNext("目前沒有喔");
+                } else {
+                    e.onNext("有東西～爽");
+                }
+
+            }
+        });
+    }
+
+
 }
