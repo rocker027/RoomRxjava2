@@ -1,5 +1,6 @@
 package com.coors.roomrxjava2;
 
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,14 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+
+import com.coors.roomrxjava2.databinding.ActivityMainBinding;
+
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -27,11 +29,37 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private String text = null;
 
+    private MainViewModel mainViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        MainViewModel model = new MainViewModel();
+        binding.setModel(model);
 
+        Log.d(TAG, "start refresh");
+        model.refresh();
+
+//        mainViewModel = new MainViewModel();
+//        Button btn = findViewById(R.id.button);
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mainViewModel.refresh();
+//            }
+//        });
+
+
+
+
+
+
+        // 觀察text變數，倘若有改變時，更新view
+//        obsStringChange();
+//        findViews();
+    }
+
+    private void obsStringChange() {
         Observable<String> test = getTextObs();
         test.subscribe(new Consumer<String>() {
             @Override
@@ -48,16 +76,18 @@ public class MainActivity extends AppCompatActivity {
                         text = "100";
                     }
                 });
-        findViews();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        // onStart去訂閱Obs
+//        onStartToSubObs();
 
+    }
 
-
+    private void onStartToSubObs() {
         Observable<String> buttonOnClickObservable = createSearchButtonOnClickObservable();
         buttonOnClickObservable
                 // 指定 subscribe 也就是訂閱當下使用new thread
@@ -120,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     });
-
     }
 
     private void findViews() {
